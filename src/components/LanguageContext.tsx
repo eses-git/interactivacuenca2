@@ -14,6 +14,11 @@ const translations = {
     templates: "Plantillas",
     contact: "Contacto",
 
+    formSuccessTitle: "¡Mensaje Enviado!",
+    formSuccessMessage: "Gracias por contactarnos. Te responderemos lo antes posible.",
+    formErrorTitle: "¡Oops! Algo salió mal",
+    formErrorMessage: "No se pudo enviar tu mensaje. Por favor, intenta de nuevo o contáctanos directamente.",
+    closeButton: "Cerrar",
 
     
     // Hero
@@ -287,6 +292,11 @@ const translations = {
     templates: "Templates",
     contact: "Contact",
     
+  formSuccessTitle: "Message Sent!",
+  formSuccessMessage: "Thank you for contacting us. We will get back to you as soon as possible.",
+  formErrorTitle: "Oops! Something went wrong",
+  formErrorMessage: "Your message could not be sent. Please try again or contact us directly.",
+  closeButton: "Close",
     // Hero
     heroTitle: "We Create Exceptional Digital Experiences",
     heroSubtitle: "The Digital Revolution Starts Here",

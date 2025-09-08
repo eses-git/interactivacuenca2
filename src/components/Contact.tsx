@@ -1,97 +1,153 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Phone, Mail, MapPin, MessageCircle, Sparkles, Clock, CheckCircle, ArrowRight, Star, XCircle, X } from 'lucide-react';
-import emailjs from '@emailjs/browser';  // EmailJS import
+import { Send, Phone, Mail, MapPin, MessageCircle, Sparkles, CheckCircle, ArrowRight, Star, XCircle, X } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 import { useLanguage } from './LanguageContext';
 
+// ▼▼▼ NUEVO COMPONENTE PARA EL POPUP MODAL ▼▼▼
+interface ConfirmationModalProps {
+  status: { message: string; type: 'success' | 'error' | null };
+  onClose: () => void;
+  t: (key: string) => string;
+}
 
+function ConfirmationModal({ status, onClose, t }: ConfirmationModalProps) {
+  if (!status.type) return null;
 
+  const isSuccess = status.type === 'success';
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+      >
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0, y: 30 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.8, opacity: 0, y: 30 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+          onClick={(e) => e.stopPropagation()} // Evita que el clic en el modal lo cierre
+          className={`relative w-full max-w-md p-6 sm:p-8 bg-gradient-to-br ${
+            isSuccess ? 'from-green-900/50 to-emerald-900/30' : 'from-red-900/50 to-rose-900/30'
+          } border ${
+            isSuccess ? 'border-green-500/30' : 'border-red-500/30'
+          } rounded-2xl shadow-2xl text-center`}
+        >
+          {/* Icono animado */}
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 20 }}
+            className={`mx-auto w-16 h-16 sm:w-20 sm:h-20 mb-4 sm:mb-6 rounded-full flex items-center justify-center bg-gradient-to-br ${
+              isSuccess ? 'from-green-500 to-emerald-600' : 'from-red-500 to-rose-600'
+            }`}
+          >
+            {isSuccess ? (
+              <motion.svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <motion.path
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 0.5, ease: 'easeInOut', delay: 0.4 }}
+                  d="M20 6L9 17l-5-5"
+                />
+              </motion.svg>
+            ) : (
+              <XCircle className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+            )}
+          </motion.div>
+
+          {/* Título y Mensaje */}
+          <motion.h3
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="text-xl sm:text-2xl font-bold text-white mb-2"
+          >
+            {t(isSuccess ? 'formSuccessTitle' : 'formErrorTitle')}
+          </motion.h3>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="text-foreground/80 text-sm sm:text-base mb-6 sm:mb-8"
+          >
+            {status.message}
+          </motion.p>
+          
+          {/* Botón de cerrar */}
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            onClick={onClose}
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-2 sm:py-3 text-base font-semibold shadow-xl rounded-md transition-transform duration-200 active:scale-95"
+          >
+            {t('closeButton')}
+          </motion.button>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
 
 
 export function Contact() {
-  
   const { t } = useLanguage();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const [formStatus, setFormStatus] = useState<{
-    message: string;
-    type: 'success' | 'error' | null;
-  }>({ message: '', type: null });
+  const [formStatus, setFormStatus] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
 
-
-  // Initialize EmailJS
   useEffect(() => {
     const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-    if (publicKey) {
-      emailjs.init(publicKey);
-      console.log('EmailJS initialized');
-    } else {
-      console.error('EmailJS public key missing');
-    }
+    if (publicKey) emailjs.init(publicKey);
+    else console.error('EmailJS public key missing');
   }, []);
-
-  useEffect(() => {
-    if (formStatus.type) {
-      const timer = setTimeout(() => {
-        setFormStatus({ message: '', type: null });
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [formStatus]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-
     setIsSubmitting(true);
     setFormStatus({ message: '', type: null });
 
     try {
-
-
-      const templateParams = {
-        from_name: formData.name,
-        from_email: formData.email,
-        message: formData.message,
-      };
-
+      const templateParams = { from_name: formData.name, from_email: formData.email, message: formData.message };
       const result = await emailjs.send(
         import.meta.env.VITE_EMAILJS_SERVICE_ID || '',
         import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '',
         templateParams
       );
 
-
-      console.log('EmailJS Response:', result);
-
       if (result.status === 200) {
         setFormData({ name: '', email: '', message: '' });
-        setFormStatus({ 
-          type: 'success', 
-          message: '¡Mensaje enviado con éxito! Te contactaremos pronto.'
-        });
+        setFormStatus({ type: 'success', message: t('formSuccessMessage') });
       } else {
         throw new Error(`EmailJS failed: ${result.text}`);
       }
     } catch (err: any) {
       console.error('EmailJS Error:', err);
-      setFormStatus({ type: 'error', message: err.message || 'Error al enviar el mensaje. Intenta de nuevo.' });
+      setFormStatus({ type: 'error', message: t('formErrorMessage') });
     }
     setIsSubmitting(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // ... (tus constantes contactChannels y processSteps no necesitan cambios)
   const contactChannels = [
     {
       icon: <Phone className="w-5 h-5 sm:w-6 sm:h-6" />,
@@ -145,9 +201,9 @@ export function Contact() {
 
   return (
     <>
-      <section
-       id="contact"
-        className="section-spacing bg-gradient-to-br from-background to-muted/10 relative overflow-hidden">
+      <section id="contact" className="section-spacing bg-gradient-to-br from-background to-muted/10 relative overflow-hidden">
+        {/* ... (tu sección de contacto no necesita cambios) ... */}
+        {/* ▼▼▼ El código de la sección es largo, así que lo omito por brevedad, no necesita cambios. Pega esto después de la sección. ▼▼▼ */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-grid-pattern opacity-5" />
           {Array.from({ length: 10 }).map((_, i) => (
@@ -394,43 +450,12 @@ export function Contact() {
         </div>
       </section>
 
-      {/* Designed Popups (Success/Error Toast) */}
-      <AnimatePresence>
-        {formStatus.type && (
-          <motion.div
-            initial={{ opacity: 0, y: 50, scale: 0.3 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5, transition: { duration: 0.2 } }}
-            className={`fixed bottom-5 right-5 w-full max-w-sm p-4 shadow-lg rounded-lg border text-white z-50 ${
-              formStatus.type === 'success'
-                ? 'bg-gradient-to-br from-green-500 to-emerald-600 border-green-700'
-                : 'bg-gradient-to-br from-red-500 to-rose-600 border-red-700'
-            }`}
-          >
-            <div className="flex items-start space-x-3">
-              <div className="flex-shrink-0">
-                {formStatus.type === 'success' ? (
-                  <CheckCircle className="w-6 h-6" />
-                ) : (
-                  <XCircle className="w-6 h-6" />
-                )}
-              </div>
-              <div className="flex-1">
-                <p className="font-bold text-base">
-                  {formStatus.type === 'success' ? '¡Éxito!' : 'Error'}
-                </p>
-                <p className="text-sm">{formStatus.message} -</p>
-              </div>
-              <button 
-                onClick={() => setFormStatus({ message: '', type: null })} 
-                className="p-1 rounded-full hover:bg-white/20 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {/* ▼▼▼ REEMPLAZA EL ANTIGUO POPUP CON EL NUEVO ▼▼▼ */}
+      <ConfirmationModal 
+        status={formStatus} 
+        onClose={() => setFormStatus({ message: '', type: null })}
+        t={t}
+      />
     </>
   );
 }
