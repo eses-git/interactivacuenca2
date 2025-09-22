@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Phone, Mail, MapPin, MessageCircle, Sparkles, CheckCircle, ArrowRight, Star, XCircle, X } from 'lucide-react';
+import { Send, Phone, Mail, MapPin, MessageCircle, Sparkles, CheckCircle, ArrowRight, Star, XCircle } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 import { useLanguage } from './LanguageContext';
 
@@ -111,35 +111,59 @@ export function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
 
+  // ▼▼▼ CÓDIGO ACTUALIZADO CON LOGS ▼▼▼
   useEffect(() => {
     const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-    if (publicKey) emailjs.init(publicKey);
-    else console.error('EmailJS public key missing');
+    
+    // LOG 1: Check if your environment variables are loading correctly on page load.
+    console.log("EmailJS Public Key:", publicKey);
+    
+    if (publicKey) {
+      emailjs.init(publicKey);
+    } else {
+      console.error('CRITICAL: EmailJS public key is missing or undefined!');
+    }
   }, []);
 
+  // ▼▼▼ CÓDIGO ACTUALIZADO CON LOGS ▼▼▼
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setFormStatus({ message: '', type: null });
-
+    
+    // LOG 2: Confirm that the submit function is being called when you click the button.
+    console.log("Form submission started...");
+  
+    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
+    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
+    const templateParams = {
+      from_name: formData.name,
+      from_email: formData.email,
+      message: formData.message
+    };
+  
+    // LOG 3: See the exact data and IDs you are about to send to EmailJS.
+    console.log("Sending to EmailJS with:", {
+      serviceId,
+      templateId,
+      templateParams
+    });
+  
     try {
-      const templateParams = { from_name: formData.name, from_email: formData.email, message: formData.message };
-      const result = await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID || '',
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '',
-        templateParams
-      );
-
-      if (result.status === 200) {
-        setFormData({ name: '', email: '', message: '' });
-        setFormStatus({ type: 'success', message: t('formSuccessMessage') });
-      } else {
-        throw new Error(`EmailJS failed: ${result.text}`);
-      }
+      const result = await emailjs.send(serviceId, templateId, templateParams);
+  
+      // LOG 4: If the email sends successfully, see the response from EmailJS.
+      console.log('SUCCESS!', result.status, result.text);
+      
+      setFormData({ name: '', email: '', message: '' });
+      setFormStatus({ type: 'success', message: t('formSuccessMessage') });
+  
     } catch (err: any) {
-      console.error('EmailJS Error:', err);
+      // LOG 5: If there's an error, this is the MOST IMPORTANT log. It will tell you why it failed.
+      console.error('FAILED...', err);
+      
       setFormStatus({ type: 'error', message: t('formErrorMessage') });
     }
+    
     setIsSubmitting(false);
   };
 
@@ -147,7 +171,6 @@ export function Contact() {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  // ... (tus constantes contactChannels y processSteps no necesitan cambios)
   const contactChannels = [
     {
       icon: <Phone className="w-5 h-5 sm:w-6 sm:h-6" />,
@@ -202,8 +225,7 @@ export function Contact() {
   return (
     <>
       <section id="contact" className="section-spacing bg-gradient-to-br from-background to-muted/10 relative overflow-hidden">
-        {/* ... (tu sección de contacto no necesita cambios) ... */}
-        {/* ▼▼▼ El código de la sección es largo, así que lo omito por brevedad, no necesita cambios. Pega esto después de la sección. ▼▼▼ */}
+        {/* The rest of your JSX remains unchanged */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-grid-pattern opacity-5" />
           {Array.from({ length: 10 }).map((_, i) => (
@@ -255,7 +277,6 @@ export function Contact() {
             </p>
             <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto mt-6 sm:mt-8" />
           </motion.div>
-
 
           <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-8 sm:gap-12">
             <motion.div
@@ -382,8 +403,6 @@ export function Contact() {
                     />
                   </motion.div>
 
-          
-
                   <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} viewport={{ once: true }}>
                     <button
                       type="submit" disabled={isSubmitting}
@@ -450,7 +469,6 @@ export function Contact() {
         </div>
       </section>
 
-      {/* ▼▼▼ REEMPLAZA EL ANTIGUO POPUP CON EL NUEVO ▼▼▼ */}
       <ConfirmationModal 
         status={formStatus} 
         onClose={() => setFormStatus({ message: '', type: null })}
