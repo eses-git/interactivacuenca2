@@ -113,7 +113,9 @@ export function Contact() {
 
   // ▼▼▼ CÓDIGO ACTUALIZADO CON LOGS ▼▼▼
   useEffect(() => {
-    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+    //const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+    const publicKey ='li2AIQdiZMHuVedLC'
     
     // LOG 1: Check if your environment variables are loading correctly on page load.
     console.log("EmailJS Public Key:", publicKey);
