@@ -118,7 +118,7 @@ export function Contact() {
     const publicKey ='li2AIQdiZMHuVedLC'
     
     // LOG 1: Check if your environment variables are loading correctly on page load.
-    console.log("EmailJS Public Key:", publicKey);
+    //console.log("EmailJS Public Key:", publicKey);
     
     if (publicKey) {
       emailjs.init(publicKey);
@@ -133,7 +133,7 @@ export function Contact() {
     setIsSubmitting(true);
     
     // LOG 2: Confirm that the submit function is being called when you click the button.
-    console.log("Form submission started...");
+   // console.log("Form submission started...");
   
     const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID || '';
     const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || '';
@@ -144,24 +144,24 @@ export function Contact() {
     };
   
     // LOG 3: See the exact data and IDs you are about to send to EmailJS.
-    console.log("Sending to EmailJS with:", {
+    /*console.log("Sending to EmailJS with:", {
       serviceId,
       templateId,
       templateParams
-    });
+    });*/
   
     try {
       const result = await emailjs.send(serviceId, templateId, templateParams);
   
       // LOG 4: If the email sends successfully, see the response from EmailJS.
-      console.log('SUCCESS!', result.status, result.text);
+     // console.log('SUCCESS!', result.status, result.text);
       
       setFormData({ name: '', email: '', message: '' });
       setFormStatus({ type: 'success', message: t('formSuccessMessage') });
   
     } catch (err: any) {
       // LOG 5: If there's an error, this is the MOST IMPORTANT log. It will tell you why it failed.
-      console.error('FAILED...', err);
+      //console.error('FAILED...', err);
       
       setFormStatus({ type: 'error', message: t('formErrorMessage') });
     }
