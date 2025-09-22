@@ -124,7 +124,7 @@ const translations = {
     feature11: "Soporte técnico especializado incluido",
     feature12: "Disponible en varios idiomas",
     
-    domainBonus: "Dominio premium por 3 años completos",
+    domainBonus: "Dominio premium por 1 año ",
     hostingBonus: "Hosting premium de alta velocidad por 1 año",
     maintenanceBonus: "Mantenimiento y actualizaciones por 6 meses",
     inclusionsTitle: "Bonificaciones Incluidas",
@@ -401,7 +401,7 @@ const translations = {
     feature11: "Specialized technical support included",
     feature12: "Available in multiple languages",
     
-    domainBonus: "Premium domain for 3 full years",
+    domainBonus: "Premium domain for 1 year",
     hostingBonus: "High-speed premium hosting for 1 year",
     maintenanceBonus: "Maintenance and updates for 6 months",
     inclusionsTitle: "Included Bonuses",
