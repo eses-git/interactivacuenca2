@@ -281,7 +281,7 @@ const translations = {
     
     // Company Info
     companyName: "InteractivaCuenca",
-    companyEmail: "interactivacuenca@proton.me",
+    companyEmail: "info@interactivacuenca.com",
     companyPhone: "+593 96 705 7022",
     companyLocation: "Cuenca, Ecuador"
   },
