@@ -1,11 +1,22 @@
-import React from 'react';
-import { motion } from 'framer-motion'; // <-- CORRECTED IMPORT
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { useLanguage } from './LanguageContext';
 import { Code, Palette, Zap, Users, Brain, Lightbulb, Cpu, Network, Database, Shield, Rocket, Search, Globe } from 'lucide-react';
 import { Card } from './ui/card';
+import { isMobile } from 'react-device-detect'; // Add this import
 
 export function About() {
   const { t } = useLanguage();
+  const [isMobileDevice, setIsMobileDevice] = useState(isMobile); // Initial detection
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileDevice(window.innerWidth <= 768 || isMobile);
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const innovations = [
     {
@@ -109,7 +120,7 @@ export function About() {
       {/* Background Elements */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-grid-pattern opacity-3" />
-        {Array.from({ length: 12 }).map((_, i) => (
+        {Array.from({ length: isMobileDevice ? 6 : 12 }).map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-blue-500/20"
@@ -118,11 +129,11 @@ export function About() {
               top: `${10 + (i % 4) * 20}%`,
             }}
             animate={{
-              scale: [1, 2, 1],
-              opacity: [0.2, 0.6, 0.2],
+              scale: [1, 1.5, 1], // Smaller scale on mobile if desired, but kept mild
+              opacity: [0.2, 0.4, 0.2],
             }}
             transition={{
-              duration: 4 + i * 0.3,
+              duration: isMobileDevice ? 5 + i * 0.4 : 4 + i * 0.3, // Slower on mobile
               repeat: Infinity,
               ease: "easeInOut",
             }}
@@ -135,16 +146,16 @@ export function About() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: isMobileDevice ? 0.6 : 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-16 sm:mb-20 content-spacing-lg max-w-4xl mx-auto px-4"
+          className="text-center mb-16 sm:mb-20 content-spacing-lg max-w-4xl mx-auto px-4 about-animated" // Added class
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: isMobileDevice ? 0.4 : 0.6 }}
             viewport={{ once: true }}
-            className="inline-flex items-center space-x-2 sm:space-x-3 bg-gradient-to-r from-blue-500/10 to-purple-600/10 border border-blue-500/20 px-4 sm:px-6 py-2 sm:py-3 mb-6 sm:mb-8"
+            className="inline-flex items-center space-x-2 sm:space-x-3 bg-gradient-to-r from-blue-500/10 to-purple-600/10 border border-blue-500/20 px-4 sm:px-6 py-2 sm:py-3 mb-6 sm:mb-8 about-animated" // Added class
           >
             <Cpu className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
             <span className="text-xs sm:text-sm text-foreground/80 font-mono">{t('aboutSubtitle')}</span>
@@ -163,9 +174,9 @@ export function About() {
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: isMobileDevice ? 0.6 : 0.8 }}
           viewport={{ once: true }}
-          className="mb-20 sm:mb-24"
+          className="mb-20 sm:mb-24 about-animated" // Added class
         >
           <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-center mb-8 sm:mb-12 text-foreground max-w-4xl mx-auto px-4" style={{ fontSize: 'calc(1.5rem + 3px)' }}>{t('technologicalInnovations')}</h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -174,14 +185,14 @@ export function About() {
                 key={index}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: isMobileDevice ? 0.4 : 0.6, delay: isMobileDevice ? index * 0.05 : index * 0.1 }}
                 viewport={{ once: true }}
-                whileHover={{ y: -5 }}
-                className="group"
+                whileHover={isMobileDevice ? {} : { y: -5 }} // Disable hover on mobile
+                className="group about-animated" // Added class
               >
                 <Card className="p-4 sm:p-6 h-full bg-card/30 backdrop-blur-sm border border-border/50 group-hover:border-blue-500/30 transition-all duration-300">
                   <motion.div
-                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    whileHover={isMobileDevice ? {} : { scale: 1.1, rotate: 5 }} // Disable on mobile
                     transition={{ duration: 0.3 }}
                     className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500/20 to-purple-600/20 border border-blue-500/30 flex items-center justify-center text-blue-500 mx-auto mb-3 sm:mb-4"
                   >
@@ -199,9 +210,9 @@ export function About() {
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: isMobileDevice ? 0.6 : 0.8 }}
           viewport={{ once: true }}
-          className="mb-16 sm:mb-20"
+          className="mb-16 sm:mb-20 about-animated" // Added class
         >
           <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-center mb-3 sm:mb-4 max-w-4xl mx-auto px-4">{t('modernDevProcess')}</h3>
           <p className="text-foreground/60 text-center mb-12 sm:mb-16 max-w-2xl mx-auto leading-relaxed px-4" style={{ fontSize: 'calc(1.375rem + 3px)' }}>
@@ -215,13 +226,13 @@ export function About() {
                   key={index}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.15 }}
+                  transition={{ duration: isMobileDevice ? 0.4 : 0.6, delay: isMobileDevice ? index * 0.1 : index * 0.15 }}
                   viewport={{ once: true }}
-                  className="relative group cursor-pointer"
+                  className="relative group cursor-pointer about-animated" // Added class
                 >
                   <div className="flex justify-center mb-6 sm:mb-8">
                     <motion.div
-                      whileHover={{ scale: 1.05 }}
+                      whileHover={isMobileDevice ? {} : { scale: 1.05 }} // Disable on mobile
                       className={`relative w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br ${phase.color} flex items-center justify-center text-white shadow-2xl rounded-full`}
                     >
                       <div className="flex flex-col items-center">
@@ -230,7 +241,6 @@ export function About() {
                       </div>
                     </motion.div>
                   </div>
-
 
                   <Card className={`p-4 sm:p-6 lg:p-8 transition-all duration-300 bg-gradient-to-br ${phase.bgColor} border-2 ${phase.borderColor} hover:scale-[1.01] hover:shadow-lg min-h-[300px] sm:min-h-[420px] flex flex-col`}>
                     <div className="text-center mb-4 sm:mb-6">
@@ -252,9 +262,9 @@ export function About() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 1 }}
+              transition={{ duration: isMobileDevice ? 0.6 : 0.8, delay: isMobileDevice ? 0.6 : 1 }}
               viewport={{ once: true }}
-              className="text-center mt-12 sm:mt-[50px]"
+              className="text-center mt-12 sm:mt-[50px] about-animated" // Added class
             >
               <Card className="p-6 sm:p-8 bg-gradient-to-r from-blue-500/5 to-purple-500/5 border border-blue-500/20 max-w-3xl mx-auto">
                 <div className="flex items-center justify-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
@@ -276,15 +286,15 @@ export function About() {
               key={index}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              transition={{ duration: isMobileDevice ? 0.4 : 0.6, delay: isMobileDevice ? index * 0.05 : index * 0.1 }}
               viewport={{ once: true }}
-              whileHover={{ y: -10 }}
-              className="h-full"
+              whileHover={isMobileDevice ? {} : { y: -10 }} // Disable on mobile
+              className="h-full about-animated" // Added class
             >
               <Card className="p-4 sm:p-6 h-full bg-card/30 backdrop-blur-sm border border-border/50 relative overflow-hidden group hover:shadow-2xl transition-all duration-300">
                 <div className="relative z-10 content-spacing">
                   <motion.div
-                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    whileHover={isMobileDevice ? {} : { scale: 1.1, rotate: 5 }} // Disable on mobile
                     transition={{ duration: 0.3 }}
                     className={`w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br ${feature.gradient} flex items-center justify-center text-white mb-4 sm:mb-6 group-hover:shadow-lg transition-shadow`}
                   >

@@ -1,14 +1,25 @@
-import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion'; // Corrected import
 import { useLanguage } from './LanguageContext';
 import { Check, Globe, Smartphone, Image, Mail, MapPin, Search, Share2, Gift, Shield, Zap, Cloud, Settings, Headphones, Gauge, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
+import { isMobile } from 'react-device-detect'; // Add this import
 
 export function Services() {
   const { t } = useLanguage();
   const [hoveredFeature, setHoveredFeature] = useState<number | null>(null);
+  const [isMobileDevice, setIsMobileDevice] = useState(isMobile); // Initial detection
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileDevice(window.innerWidth <= 768 || isMobile);
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const features = [
     { icon: <Globe className="w-4 h-4 sm:w-5 sm:h-5" />, key: 'feature1', category: 'core' },
@@ -36,7 +47,7 @@ export function Services() {
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-        {Array.from({ length: 8 }).map((_, i) => (
+        {Array.from({ length: isMobileDevice ? 4 : 8 }).map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 opacity-20"
@@ -49,7 +60,7 @@ export function Services() {
               opacity: [0.2, 0.5, 0.2],
             }}
             transition={{
-              duration: 3 + i * 0.3,
+              duration: isMobileDevice ? 4 + i * 0.4 : 3 + i * 0.3,
               repeat: Infinity,
               ease: "easeInOut",
             }}
@@ -61,16 +72,16 @@ export function Services() {
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: isMobileDevice ? 0.6 : 0.8 }}
           viewport={{ once: true }}
-          className="text-center mb-12 sm:mb-16 content-spacing-lg max-w-4xl mx-auto px-4"
+          className="text-center mb-12 sm:mb-16 content-spacing-lg max-w-4xl mx-auto px-4 services-animated" // Added class
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: isMobileDevice ? 0.4 : 0.6 }}
             viewport={{ once: true }}
-            className="inline-flex items-center space-x-2 sm:space-x-3 bg-gradient-to-r from-blue-500/10 to-purple-600/10 border border-blue-500/20 px-4 sm:px-6 py-2 sm:py-3 mb-6 sm:mb-8"
+            className="inline-flex items-center space-x-2 sm:space-x-3 bg-gradient-to-r from-blue-500/10 to-purple-600/10 border border-blue-500/20 px-4 sm:px-6 py-2 sm:py-3 mb-6 sm:mb-8 services-animated" // Added class
           >
             <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
             <span className="text-xs sm:text-sm text-foreground/80">{t('premiumSol')}</span>
@@ -88,35 +99,34 @@ export function Services() {
 
         <div className="max-w-7xl mx-auto relative">
           {/* Floating Promotion Badge - Higher on small mobile */}
-          
-<motion.div
-  initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
-  whileInView={{ opacity: 1, scale: 1, rotate: 3 }}
-  transition={{ duration: 0.6, delay: 0.4 }}
-  viewport={{ once: true }}
-  className="absolute -top-8 -right-2 sm:-top-4 sm:-right-4 z-30 promo-banner"
->
-  {/* Mobile padding is now 50% of desktop */}
-  <div className="bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 sm:px-8 py-2.5 sm:py-5 transform rotate-3 shadow-2xl border-2 border-white/20">
-    {/* Mobile spacing is 50% of desktop */}
-    <div className="flex items-center space-x-3 sm:space-x-2">
-      {/* Mobile icon size is 50% of desktop */}
-      <Gift className="w-3.5 h-3.5 sm:w-7 sm:h-7" />
-      <div>
-        {/* Mobile font sizes are 50% of desktop */}
-        <div className="font-bold text-[0.56rem] sm:text-lg"> {t('limitedOffer')}</div>
-        <div className="text-[0.44rem] sm:text-sm opacity-90"> {t('untilOctober')}</div>
-      </div>
-    </div>
-  </div>
-</motion.div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
+            whileInView={{ opacity: 1, scale: 1, rotate: 3 }}
+            transition={{ duration: isMobileDevice ? 0.4 : 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="absolute -top-8 -right-2 sm:-top-4 sm:-right-4 z-30 promo-banner services-animated" // Added class
+          >
+            {/* Mobile padding is now 50% of desktop */}
+            <div className="bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 sm:px-8 py-2.5 sm:py-5 transform rotate-3 shadow-2xl border-2 border-white/20">
+              {/* Mobile spacing is 50% of desktop */}
+              <div className="flex items-center space-x-3 sm:space-x-2">
+                {/* Mobile icon size is 50% of desktop */}
+                <Gift className="w-3.5 h-3.5 sm:w-7 sm:h-7" />
+                <div>
+                  {/* Mobile font sizes are 50% of desktop */}
+                  <div className="font-bold text-[0.56rem] sm:text-lg"> {t('limitedOffer')}</div>
+                  <div className="text-[0.44rem] sm:text-sm opacity-90"> {t('untilOctober')}</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            transition={{ duration: isMobileDevice ? 0.6 : 0.8, delay: 0.2 }}
             viewport={{ once: true }}
-            className="relative"
+            className="relative services-animated" // Added class
           >
             {/* Main Offer Card */}
             <Card className="p-4 sm:p-8 lg:p-12 bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm border border-border/50 relative shadow-2xl">
@@ -134,9 +144,9 @@ export function Services() {
                   <motion.div
                     initial={{ opacity: 0, x: -50 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.6 }}
+                    transition={{ duration: isMobileDevice ? 0.4 : 0.6, delay: 0.6 }}
                     viewport={{ once: true }}
-                    className="text-center lg:text-left content-spacing"
+                    className="text-center lg:text-left content-spacing services-animated" // Added class
                   >
                     <Badge className="mb-4 sm:mb-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 sm:px-4 py-1 sm:py-2 text-xs sm:text-sm">
                       {t('promotionalPrice')}
@@ -155,8 +165,8 @@ export function Services() {
                       
                       {/* Savings Highlight */}
                       <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        className="inline-block bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 px-4 sm:px-6 py-2 sm:py-3 mb-4 sm:mb-6"
+                        whileHover={isMobileDevice ? {} : { scale: 1.05 }} // Disable on mobile
+                        className="inline-block bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 px-4 sm:px-6 py-2 sm:py-3 mb-4 sm:mb-6 services-animated" // Added class
                       >
                         <div className="flex items-center space-x-2">
                           <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
@@ -170,9 +180,9 @@ export function Services() {
                   <motion.div
                     initial={{ opacity: 0, x: 50 }}
                     whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.6, delay: 0.8 }}
+                    transition={{ duration: isMobileDevice ? 0.4 : 0.6, delay: 0.8 }}
                     viewport={{ once: true }}
-                    className="space-y-3 sm:space-y-4"
+                    className="space-y-3 sm:space-y-4 services-animated" // Added class
                   >
                     <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center lg:text-left">{t('inclusionsTitle')}</h3>
                     {bonuses.map((bonus, index) => (
@@ -180,15 +190,15 @@ export function Services() {
                         key={bonus.key}
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.9 + index * 0.1 }}
+                        transition={{ duration: isMobileDevice ? 0.3 : 0.5, delay: 0.9 + index * 0.1 }}
                         viewport={{ once: true }}
-                        whileHover={{ scale: 1.02, x: 10 }}
-                        className="group"
+                        whileHover={isMobileDevice ? {} : { scale: 1.02, x: 10 }} // Disable on mobile
+                        className="group services-animated" // Added class
                       >
                         <Card className="p-3 sm:p-5 bg-gradient-to-r from-blue-500/5 to-purple-500/5 border border-blue-500/20 group-hover:border-blue-500/40 transition-all duration-300 group-hover:shadow-lg">
                           <div className="flex items-center space-x-3 sm:space-x-4">
                             <motion.div
-                              whileHover={{ rotate: 360 }}
+                              whileHover={isMobileDevice ? {} : { rotate: 360 }} // Disable on mobile
                               transition={{ duration: 0.6 }}
                               className="flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white shadow-lg"
                             >
@@ -216,17 +226,17 @@ export function Services() {
                         key={feature.key}
                         initial={{ opacity: 0, scale: 0.8 }}
                         whileInView={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.5, delay: 0.05 * index }}
+                        transition={{ duration: isMobileDevice ? 0.3 : 0.5, delay: isMobileDevice ? 0.03 * index : 0.05 * index }}
                         viewport={{ once: true }}
-                        whileHover={{ scale: 1.05 }}
-                        onMouseEnter={() => setHoveredFeature(index)}
-                        onMouseLeave={() => setHoveredFeature(null)}
-                        className="relative group cursor-pointer"
+                        whileHover={isMobileDevice ? {} : { scale: 1.05 }} // Disable on mobile
+                        onMouseEnter={() => !isMobileDevice && setHoveredFeature(index)} // Disable state change on mobile
+                        onMouseLeave={() => !isMobileDevice && setHoveredFeature(null)}
+                        className="relative group cursor-pointer services-animated" // Added class
                       >
                         <Card className="p-3 sm:p-4 bg-gradient-to-br from-card/50 to-card/20 border border-border/30 group-hover:border-blue-500/50 transition-all duration-300 h-full group-hover:shadow-lg">
                           <div className="flex items-start space-x-2 sm:space-x-3">
                             <motion.div
-                              whileHover={{ scale: 1.2 }}
+                              whileHover={isMobileDevice ? {} : { scale: 1.2 }} // Disable on mobile
                               className="flex-shrink-0 w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500/20 to-purple-600/20 border border-blue-500/30 flex items-center justify-center text-blue-500 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-purple-600 group-hover:text-white transition-all duration-300"
                             >
                               {feature.icon}
@@ -256,9 +266,9 @@ export function Services() {
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 1.2 }}
+                  transition={{ duration: isMobileDevice ? 0.4 : 0.6, delay: 1.2 }}
                   viewport={{ once: true }}
-                  className="text-center pt-6 sm:pt-8 border-t border-border/30 content-spacing"
+                  className="text-center pt-6 sm:pt-8 border-t border-border/30 content-spacing services-animated" 
                 >
                   <Card className="p-4 sm:p-6 bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/30 mb-4 sm:mb-6">
                     <div className="flex items-center justify-center space-x-2 sm:space-x-3 text-red-500 mb-2">
@@ -271,7 +281,7 @@ export function Services() {
                   </Card>
                   
                   <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <motion.div whileHover={isMobileDevice ? {} : { scale: 1.05 }} whileTap={{ scale: 0.95 }} className="services-animated"> 
                       <Button
                         onClick={() => {
                           const contactSection = document.getElementById('contact');

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Phone, Mail, MapPin, MessageCircle, Sparkles, CheckCircle, ArrowRight, Star, XCircle } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 import { useLanguage } from './LanguageContext';
+import { isMobile } from 'react-device-detect'; // Add this import
 
 // ▼▼▼ NUEVO COMPONENTE PARA EL POPUP MODAL ▼▼▼
 interface ConfirmationModalProps {
@@ -12,6 +13,17 @@ interface ConfirmationModalProps {
 }
 
 function ConfirmationModal({ status, onClose, t }: ConfirmationModalProps) {
+  const [isMobileDevice, setIsMobileDevice] = useState(isMobile); // Initial detection
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileDevice(window.innerWidth <= 768 || isMobile);
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   if (!status.type) return null;
 
   const isSuccess = status.type === 'success';
@@ -23,7 +35,7 @@ function ConfirmationModal({ status, onClose, t }: ConfirmationModalProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 contact-animated" // Added class
       >
         <motion.div
           initial={{ scale: 0.8, opacity: 0, y: 30 }}
@@ -35,7 +47,7 @@ function ConfirmationModal({ status, onClose, t }: ConfirmationModalProps) {
             isSuccess ? 'from-green-900/50 to-emerald-900/30' : 'from-red-900/50 to-rose-900/30'
           } border ${
             isSuccess ? 'border-green-500/30' : 'border-red-500/30'
-          } rounded-2xl shadow-2xl text-center`}
+          } rounded-2xl shadow-2xl text-center contact-animated`} // Added class
         >
           {/* Icono animado */}
           <motion.div
@@ -44,7 +56,7 @@ function ConfirmationModal({ status, onClose, t }: ConfirmationModalProps) {
             transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 20 }}
             className={`mx-auto w-16 h-16 sm:w-20 sm:h-20 mb-4 sm:mb-6 rounded-full flex items-center justify-center bg-gradient-to-br ${
               isSuccess ? 'from-green-500 to-emerald-600' : 'from-red-500 to-rose-600'
-            }`}
+            } contact-animated`} // Added class
           >
             {isSuccess ? (
               <motion.svg
@@ -61,7 +73,7 @@ function ConfirmationModal({ status, onClose, t }: ConfirmationModalProps) {
                 <motion.path
                   initial={{ pathLength: 0 }}
                   animate={{ pathLength: 1 }}
-                  transition={{ duration: 0.5, ease: 'easeInOut', delay: 0.4 }}
+                  transition={{ duration: isMobileDevice ? 0.3 : 0.5, ease: 'easeInOut', delay: 0.4 }}
                   d="M20 6L9 17l-5-5"
                 />
               </motion.svg>
@@ -75,7 +87,7 @@ function ConfirmationModal({ status, onClose, t }: ConfirmationModalProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="text-xl sm:text-2xl font-bold text-white mb-2"
+            className="text-xl sm:text-2xl font-bold text-white mb-2 contact-animated" // Added class
           >
             {t(isSuccess ? 'formSuccessTitle' : 'formErrorTitle')}
           </motion.h3>
@@ -83,7 +95,7 @@ function ConfirmationModal({ status, onClose, t }: ConfirmationModalProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 }}
-            className="text-foreground/80 text-sm sm:text-base mb-6 sm:mb-8"
+            className="text-foreground/80 text-sm sm:text-base mb-6 sm:mb-8 contact-animated" // Added class
           >
             {status.message}
           </motion.p>
@@ -94,7 +106,7 @@ function ConfirmationModal({ status, onClose, t }: ConfirmationModalProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
             onClick={onClose}
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-2 sm:py-3 text-base font-semibold shadow-xl rounded-md transition-transform duration-200 active:scale-95"
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-2 sm:py-3 text-base font-semibold shadow-xl rounded-md transition-transform duration-200 active:scale-95 contact-animated" // Added class
           >
             {t('closeButton')}
           </motion.button>
@@ -110,6 +122,16 @@ export function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formStatus, setFormStatus] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
+  const [isMobileDevice, setIsMobileDevice] = useState(isMobile); // Initial detection
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobileDevice(window.innerWidth <= 768 || isMobile);
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // ▼▼▼ CÓDIGO ACTUALIZADO CON LOGS ▼▼▼
   useEffect(() => {
@@ -230,7 +252,7 @@ export function Contact() {
         {/* The rest of your JSX remains unchanged */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-          {Array.from({ length: 10 }).map((_, i) => (
+          {Array.from({ length: isMobileDevice ? 5 : 10 }).map((_, i) => (
             <motion.div
               key={i}
               className="absolute w-2 h-2 bg-gradient-to-r from-blue-500 to-purple-500 opacity-20"
@@ -243,7 +265,7 @@ export function Contact() {
                 opacity: [0.2, 0.6, 0.2],
               }}
               transition={{
-                duration: 4 + i * 0.3,
+                duration: isMobileDevice ? 5 + i * 0.4 : 4 + i * 0.3,
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
@@ -255,16 +277,16 @@ export function Contact() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: isMobileDevice ? 0.6 : 0.8 }}
             viewport={{ once: true }}
-            className="text-center mb-12 sm:mb-16 content-spacing-lg max-w-4xl mx-auto px-4"
+            className="text-center mb-12 sm:mb-16 content-spacing-lg max-w-4xl mx-auto px-4 contact-animated" 
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6 }}
+              transition={{ duration: isMobileDevice ? 0.4 : 0.6 }}
               viewport={{ once: true }}
-              className="inline-flex items-center space-x-2 sm:space-x-3 bg-gradient-to-r from-blue-500/10 to-purple-600/10 border border-blue-500/20 px-4 sm:px-6 py-2 sm:py-3 mb-6 sm:mb-8"
+              className="inline-flex items-center space-x-2 sm:space-x-3 bg-gradient-to-r from-blue-500/10 to-purple-600/10 border border-blue-500/20 px-4 sm:px-6 py-2 sm:py-3 mb-6 sm:mb-8 contact-animated" 
             >
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
               <span className="text-xs sm:text-sm text-foreground/80">{t('letsStart')}</span>
@@ -284,9 +306,9 @@ export function Contact() {
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: isMobileDevice ? 0.6 : 0.8 }}
               viewport={{ once: true }}
-              className="space-y-6 sm:space-y-8 content-spacing-lg"
+              className="space-y-6 sm:space-y-8 content-spacing-lg contact-animated" 
             >
               <div>
                 <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center lg:text-left">{t('contactWays')}</h3>
@@ -296,17 +318,17 @@ export function Contact() {
                       key={index}
                       initial={{ opacity: 0, y: 20 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: index * 0.1 }}
+                      transition={{ duration: isMobileDevice ? 0.4 : 0.6, delay: isMobileDevice ? index * 0.05 : index * 0.1 }}
                       viewport={{ once: true }}
-                      whileHover={{ scale: 1.02, x: 10 }}
-                      className="group"
+                      whileHover={isMobileDevice ? {} : { scale: 1.02, x: 10 }} 
+                      className="group contact-animated" 
                     >
                       <div className="p-3 sm:p-4 bg-gradient-to-r from-card/50 to-card/20 border border-border/30 group-hover:border-blue-500/30 transition-all duration-300 group-hover:shadow-lg rounded-lg">
                         <div className="flex items-start space-x-3 sm:space-x-4">
                           <motion.div
-                            whileHover={{ rotate: 360 }}
+                            whileHover={isMobileDevice ? {} : { rotate: 360 }} 
                             transition={{ duration: 0.6 }}
-                            className={`flex-shrink-0 w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br ${channel.gradient} flex items-center justify-center text-white shadow-lg rounded-md`}
+                            className={`flex-shrink-0 w-8 h-8 sm:w-12 sm:h-12 bg-gradient-to-br ${channel.gradient} flex items-center justify-center text-white shadow-lg rounded-md contact-animated`} 
                           >
                             {channel.icon}
                           </motion.div>
@@ -325,8 +347,9 @@ export function Contact() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
+                transition={{ duration: isMobileDevice ? 0.6 : 0.8, delay: 0.4 }}
                 viewport={{ once: true }}
+                className="contact-animated" 
               >
                 <div className="p-4 sm:p-6 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-lg">
                   <div className="flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
@@ -340,9 +363,9 @@ export function Contact() {
                         key={index}
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        transition={{ duration: isMobileDevice ? 0.3 : 0.5, delay: isMobileDevice ? index * 0.05 : index * 0.1 }}
                         viewport={{ once: true }}
-                        className="flex items-start space-x-3 sm:space-x-4"
+                        className="flex items-start space-x-3 sm:space-x-4 contact-animated"
                       >
                         <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center font-bold text-xs sm:text-sm rounded-md">
                           {step.step}
@@ -364,9 +387,9 @@ export function Contact() {
             <motion.div
               initial={{ opacity: 0, x: 50 }}
               whileInView={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: isMobileDevice ? 0.6 : 0.8 }}
               viewport={{ once: true }}
-              className="relative mt-0 lg:mt-[90px]"
+              className="relative mt-0 lg:mt-[90px] contact-animated" 
               style={{ marginTop: '65px' }}
             >
               <div className="p-6 sm:p-8 bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-sm border border-border/50 shadow-2xl max-w-2xl mx-auto rounded-lg">
@@ -378,7 +401,7 @@ export function Contact() {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-                  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} viewport={{ once: true }}>
+                  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: isMobileDevice ? 0.4 : 0.6, delay: 0.1 }} viewport={{ once: true }} className="contact-animated"> 
                     <label className="block text-sm font-semibold text-foreground mb-2">{t('fullName')}</label>
                     <input
                       type="text" name="name" value={formData.name} onChange={handleChange} required
@@ -387,7 +410,7 @@ export function Contact() {
                     />
                   </motion.div>
 
-                  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} viewport={{ once: true }}>
+                  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: isMobileDevice ? 0.4 : 0.6, delay: 0.2 }} viewport={{ once: true }} className="contact-animated"> 
                     <label className="block text-sm font-semibold text-foreground mb-2">{t('email')}</label>
                     <input
                       type="email" name="email" value={formData.email} onChange={handleChange} required
@@ -396,7 +419,7 @@ export function Contact() {
                     />
                   </motion.div>
 
-                  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }} viewport={{ once: true }}>
+                  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: isMobileDevice ? 0.4 : 0.6, delay: 0.3 }} viewport={{ once: true }} className="contact-animated"> 
                     <label className="block text-sm font-semibold text-foreground mb-2">{t('projectMessage')}</label>
                     <textarea
                       name="message" value={formData.message} onChange={handleChange} required rows={4}
@@ -405,7 +428,7 @@ export function Contact() {
                     />
                   </motion.div>
 
-                  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }} viewport={{ once: true }}>
+                  <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: isMobileDevice ? 0.4 : 0.6, delay: 0.4 }} viewport={{ once: true }} className="contact-animated"> 
                     <button
                       type="submit" disabled={isSubmitting}
                       className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white py-3 sm:py-4 disabled:opacity-50 disabled:cursor-not-allowed text-base sm:text-lg font-semibold shadow-xl rounded-md"
@@ -441,9 +464,9 @@ export function Contact() {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
+            transition={{ duration: isMobileDevice ? 0.6 : 0.8, delay: 0.6 }}
             viewport={{ once: true }}
-            className="mt-12 sm:mt-16 text-center"
+            className="mt-12 sm:mt-16 text-center contact-animated" 
           >
             <div className="p-6 sm:p-8 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 max-w-4xl mx-auto flex flex-col items-center gap-4 rounded-lg">
               <div>
