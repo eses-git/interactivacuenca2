@@ -65,6 +65,8 @@ export function About() {
       borderColor: 'border-amber-500/30'
     },
 
+
+
     
     {
       phase: t('developmentPhase'),
