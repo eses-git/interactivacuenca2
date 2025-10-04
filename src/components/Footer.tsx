@@ -13,6 +13,7 @@ export function Footer() {
     { icon: <Linkedin className="w-5 h-5" />, href: '#', label: 'LinkedIn' },
   ];
 
+
   
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });

@@ -18,6 +18,7 @@ export function Hero() {
   ];
 
   
+
   const techStack = [
     { icon: <Code className="w-6 h-6" />, name: 'React' },
     { icon: <Zap className="w-6 h-6" />, name: 'Performance' },

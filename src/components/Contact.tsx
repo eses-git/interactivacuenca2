@@ -29,6 +29,7 @@ function ConfirmationModal({ status, onClose, t }: ConfirmationModalProps) {
   const isSuccess = status.type === 'success';
 
   
+
   return (
     <AnimatePresence>
       <motion.div
