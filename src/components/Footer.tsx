@@ -1,10 +1,14 @@
 import React from 'react';
-import { motion } from 'motion/react';
+import { motion, Transition } from 'framer-motion';
 import { useLanguage } from './LanguageContext';
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { isMobile } from 'react-device-detect';
 
 export function Footer() {
   const { t } = useLanguage();
+  const isMobileDevice = isMobile;
+  const isFirefox = typeof navigator !== 'undefined' && /firefox/i.test(navigator.userAgent);
+  const reduceAnimations = isMobileDevice || isFirefox;  // Or && for stricter
 
   const socialLinks = [
     { icon: <Facebook className="w-5 h-5" />, href: '#', label: 'Facebook' },
@@ -13,23 +17,21 @@ export function Footer() {
     { icon: <Linkedin className="w-5 h-5" />, href: '#', label: 'LinkedIn' },
   ];
 
-
-
-  
+  const getTransition = (base: Transition) => reduceAnimations ? { ...base, duration: 0 } : base;
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <footer className="bg-gradient-to-br from-background to-muted/20 border-t border-border">
+    <footer className="bg-gradient-to-br from-background to-muted/20 border-t border-border" style={{ transform: 'translate3d(0,0,0)', backfaceVisibility: 'hidden' }}>
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {/* Company Info */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: reduceAnimations ? 1 : 0, y: reduceAnimations ? 0 : 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            transition={getTransition({ duration: 0.6 })}
             viewport={{ once: true }}
             className="lg:col-span-1 content-spacing"
           >
@@ -47,9 +49,9 @@ export function Footer() {
 
           {/* Quick Links */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: reduceAnimations ? 1 : 0, y: reduceAnimations ? 0 : 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            transition={getTransition({ duration: 0.6, delay: 0.1 })}
             viewport={{ once: true }}
           >
             <h3 className="font-semibold text-foreground mb-3 sm:mb-4 text-base sm:text-lg">{t('quickLinks')}</h3>
@@ -82,9 +84,9 @@ export function Footer() {
 
           {/* Contact Info */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: reduceAnimations ? 1 : 0, y: reduceAnimations ? 0 : 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={getTransition({ duration: 0.6, delay: 0.2 })}
             viewport={{ once: true }}
           >
             <h3 className="font-semibold text-foreground mb-3 sm:mb-4 text-base sm:text-lg">{t('contact')}</h3>
@@ -107,9 +109,9 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={{ opacity: reduceAnimations ? 1 : 0 }}
           whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={getTransition({ duration: 0.6, delay: 0.3 })}
           viewport={{ once: true }}
           className="border-t border-border mt-8 sm:mt-12 pt-6 sm:pt-8 text-center"
         >

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, Transition } from 'framer-motion';
 import { useLanguage } from './LanguageContext';
 import { Code, Palette, Zap, Users, Brain, Lightbulb, Cpu, Network, Database, Shield, Rocket, Search, Globe } from 'lucide-react';
 import { Card } from './ui/card';
@@ -7,8 +7,9 @@ import { isMobile } from 'react-device-detect';
 
 export function About() {
   const { t } = useLanguage();
-  // ✨ OPTIMIZATION: Simplified device detection. No need for useState or useEffect.
   const isMobileDevice = isMobile;
+  const isFirefox = typeof navigator !== 'undefined' && /firefox/i.test(navigator.userAgent);
+  const reduceAnimations = isMobileDevice || isFirefox;  // Or && for stricter
 
   const innovations = [
     {
@@ -101,20 +102,22 @@ export function About() {
   
   // Animation variants for containers
   const containerVariants = {
-    hidden: { opacity: 0, y: 50 },
+    hidden: { opacity: reduceAnimations ? 1 : 0, y: reduceAnimations ? 0 : 50 },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: isMobileDevice ? 0.6 : 0.8 }
+      transition: { duration: 0.8 }
     }
   };
 
+  const getTransition = (base: Transition) => reduceAnimations ? { ...base, duration: 0 } : base;
+
   return (
-    <section id="about" className="section-spacing bg-gradient-to-br from-background to-muted/10 relative overflow-hidden">
+    <section id="about" className="section-spacing bg-gradient-to-br from-background to-muted/10 relative overflow-hidden" style={{ transform: 'translate3d(0,0,0)', backfaceVisibility: 'hidden' }}>
       {/* Background Elements (Already optimized) */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-grid-pattern opacity-3" />
-        {Array.from({ length: isMobileDevice ? 4 : 10 }).map((_, i) => (
+        {!reduceAnimations && Array.from({ length: isMobileDevice ? 4 : 10 }).map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-1 h-1 bg-blue-500/20 rounded-full"
