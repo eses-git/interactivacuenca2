@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, Transition } from 'framer-motion';
 import { useLanguage } from './LanguageContext';
 import { Check, Globe, Smartphone, Image, Mail, MapPin, Search, Share2, Gift, Shield, Zap, Cloud, Settings, Headphones, Gauge, Sparkles } from 'lucide-react';
 import { Button } from './ui/button';
@@ -9,8 +9,9 @@ import { isMobile } from 'react-device-detect';
 
 export function Services() {
   const { t } = useLanguage();
-  // ✨ OPTIMIZATION: Simplified device detection.
   const isMobileDevice = isMobile;
+  const isFirefox = typeof navigator !== 'undefined' && /firefox/i.test(navigator.userAgent);
+  const reduceAnimations = isMobileDevice || isFirefox;  // Or && for stricter
 
   const features = [
     { icon: <Globe className="w-4 h-4 sm:w-5 sm:h-5" />, key: 'feature1' },
@@ -35,21 +36,23 @@ export function Services() {
   
   // Animation variant for the promo badge
   const promoBadgeAnimation = {
-    hidden: { opacity: 0, scale: 0.8, rotate: -5 },
+    hidden: { opacity: reduceAnimations ? 1 : 0, scale: reduceAnimations ? 1 : 0.8, rotate: reduceAnimations ? 0 : -5 },
     visible: { 
       opacity: 1, 
       scale: 1, 
       // ✨ OPTIMIZATION: Remove rotation on mobile
-      rotate: isMobileDevice ? 0 : 3 
+      rotate: reduceAnimations ? 0 : 3 
     }
   };
 
+  const getTransition = (base: Transition) => reduceAnimations ? { ...base, duration: 0 } : base;
+
   return (
-    <section id="services" className="section-spacing bg-gradient-to-br from-background via-muted/5 to-background relative overflow-hidden">
+    <section id="services" className="section-spacing bg-gradient-to-br from-background via-muted/5 to-background relative overflow-hidden" style={{ transform: 'translate3d(0,0,0)', backfaceVisibility: 'hidden' }}>
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-        {Array.from({ length: isMobileDevice ? 3 : 6 }).map((_, i) => (
+        {!reduceAnimations && Array.from({ length: isMobileDevice ? 3 : 6 }).map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-2 h-2 bg-blue-500/20 rounded-full"
@@ -62,9 +65,9 @@ export function Services() {
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: reduceAnimations ? 1 : 0, y: reduceAnimations ? 0 : 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={getTransition({ duration: 0.8 })}
           viewport={{ once: true, amount: 0.3 }}
           className="text-center mb-12 sm:mb-16 max-w-4xl mx-auto"
         >
@@ -87,7 +90,7 @@ export function Services() {
             variants={promoBadgeAnimation}
             initial="hidden"
             whileInView="visible"
-            transition={{ duration: 0.6, delay: 0.4, type: 'spring', stiffness: 100 }}
+            transition={getTransition({ duration: 0.6, delay: 0.4, type: 'spring', stiffness: 100 })}
             viewport={{ once: true }}
             className="absolute -top-8 -right-2 sm:-top-4 sm:-right-4 z-30"
           >
@@ -103,9 +106,9 @@ export function Services() {
           </motion.div>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: reduceAnimations ? 1 : 0, scale: reduceAnimations ? 1 : 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            transition={getTransition({ duration: 0.8, delay: 0.2 })}
             viewport={{ once: true, amount: 0.1 }}
           >
             <Card className="p-4 sm:p-8 lg:p-12 bg-card/60 backdrop-blur-lg border border-border/50 relative shadow-2xl overflow-hidden">
@@ -114,9 +117,9 @@ export function Services() {
               
               {/* ✨ OPTIMIZATION: One single animation for all card content */}
               <motion.div
-                initial={{ opacity: 0 }}
+                initial={{ opacity: reduceAnimations ? 1 : 0 }}
                 whileInView={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
+                transition={getTransition({ duration: 0.8, delay: 0.6 })}
                 viewport={{ once: true, amount: 0.1 }}
                 className="relative z-10"
               >
