@@ -3,12 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from './LanguageContext';
 import { ArrowDown, Code, Zap, Users, Cpu, Database, Smartphone, Globe, Cloud, ShoppingCart, BarChart } from 'lucide-react';
 import { Button } from './ui/button';
-import { isMobile } from 'react-device-detect'; // Add this import; install via npm if needed
+import { isMobile } from 'react-device-detect';
 
 export function Hero() {
   const { t } = useLanguage();
   const [currentTitleIndex, setCurrentTitleIndex] = useState(0);
-  const isMobileDevice = isMobile; // Use constant detection based on user agent
+  // Using 'isMobile' directly is cleaner
+  const isMobileDevice = isMobile;
 
   const titles = useMemo(() => [
     t('heroTitle'),
@@ -30,7 +31,8 @@ export function Hero() {
     { icon: <BarChart className="w-6 h-6" />, name: 'Analytics' }
   ], []);
 
-  const particles = useMemo(() => 
+  // Your particle effect logic is already correctly disabling for mobile, which is great.
+  const particles = useMemo(() =>
     Array.from({ length: 20 }).map((_, i) => ({
       key: i,
       left: Math.random() * 100,
@@ -41,9 +43,10 @@ export function Hero() {
   []);
 
   useEffect(() => {
+    // Slower animation interval on mobile is a good practice.
     const interval = setInterval(() => {
       setCurrentTitleIndex((prev) => (prev + 1) % titles.length);
-    }, isMobileDevice ? 8000 : 4000); // Slower on mobile
+    }, isMobileDevice ? 8000 : 4000);
 
     return () => clearInterval(interval);
   }, [titles.length, isMobileDevice]);
@@ -55,11 +58,19 @@ export function Hero() {
     }
   };
 
+  // ✨ OPTIMIZATION: Define animation variants based on device type
+  const titleAnimation = {
+    initial: { opacity: 0, y: isMobileDevice ? 0 : 20 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: isMobileDevice ? 0 : -20 },
+  };
+
   return (
     <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-background via-muted/5 to-background pt-20 sm:pt-24">
       {/* Background Effects */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+        {/* Correctly disabled for mobile */}
         {!isMobileDevice && particles.map(({ key, left, top, duration, delay }) => (
           <motion.div
             key={key}
@@ -105,17 +116,19 @@ export function Hero() {
           </motion.div>
 
           {/* Main Title Container */}
-          <div className="mb-6 sm:mb-8 min-h-[6rem] lg:min-h-[15rem] flex items-center justify-center hero-title"> {/* Added hero-title class */}
+          <div className="mb-6 sm:mb-8 min-h-[6rem] lg:min-h-[15rem] flex items-center justify-center hero-title">
             <AnimatePresence mode="wait">
               <motion.h1
                 key={currentTitleIndex}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ 
-                  duration: 1.5, 
-                  ease: "easeInOut" 
+                initial={titleAnimation.initial}
+                animate={titleAnimation.animate}
+                exit={titleAnimation.exit}
+                transition={{
+                  duration: 1.5,
+                  ease: "easeInOut"
                 }}
+                // ✨ OPTIMIZATION: Hint to the browser about upcoming animation
+                style={{ willChange: 'opacity, transform' }}
                 className="text-2xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-8xl font-bold bg-gradient-to-r from-foreground via-blue-500 to-purple-600 bg-clip-text text-transparent leading-tight"
               >
                 {titles[currentTitleIndex]}
@@ -127,10 +140,10 @@ export function Hero() {
           <motion.h2
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ 
-              duration: 1.2, 
+            transition={{
+              duration: 1.2,
               delay: 0.8,
-              ease: "easeOut" 
+              ease: "easeOut"
             }}
             className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold mb-6 sm:mb-8 text-blue-500"
           >
@@ -141,10 +154,10 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ 
-              duration: 1.2, 
+            transition={{
+              duration: 1.2,
               delay: 1.2,
-              ease: "easeOut" 
+              ease: "easeOut"
             }}
             className="text-base sm:text-xl lg:text-2xl text-foreground/70 max-w-4xl mx-auto mb-8 sm:mb-12 leading-relaxed px-4"
           >
@@ -155,10 +168,10 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ 
-              duration: 1.2, 
+            transition={{
+              duration: 1.2,
               delay: 1.6,
-              ease: "easeOut" 
+              ease: "easeOut"
             }}
             className="mb-12 sm:mb-16"
           >
@@ -180,19 +193,19 @@ export function Hero() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ 
-              duration: 1.2, 
+            transition={{
+              duration: 1.2,
               delay: 2.0,
-              ease: "easeOut" 
+              ease: "easeOut"
             }}
             className="mb-12 sm:mb-16"
           >
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ 
-                duration: 0.8, 
-                delay: 2.2 
+              transition={{
+                duration: 0.8,
+                delay: 2.2
               }}
               className="text-xs sm:text-sm text-foreground/60 mb-6 sm:mb-8 font-medium"
             >
@@ -204,11 +217,12 @@ export function Hero() {
                   key={tech.name}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ 
-                    duration: 0.6, 
+                  transition={{
+                    duration: 0.6,
                     delay: 2.4 + index * 0.1,
-                    ease: "easeOut" 
+                    ease: "easeOut"
                   }}
+                  // Hover effect correctly disabled on touch devices
                   whileHover={!isMobileDevice ? { scale: 1.1, y: -5 } : undefined}
                   className="flex flex-col items-center space-y-1 sm:space-y-3 group cursor-pointer"
                 >
@@ -227,10 +241,10 @@ export function Hero() {
           <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ 
-              duration: 1.2, 
+            transition={{
+              duration: 1.2,
               delay: 3.0,
-              ease: "easeOut" 
+              ease: "easeOut"
             }}
             onClick={scrollToAbout}
             className="group cursor-pointer"
