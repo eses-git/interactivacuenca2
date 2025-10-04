@@ -17,6 +17,7 @@ export function Hero() {
     <>{t('heroAlt3_line1')}<br />{t('heroAlt3_line2')}</>
   ];
 
+  
   const techStack = [
     { icon: <Code className="w-6 h-6" />, name: 'React' },
     { icon: <Zap className="w-6 h-6" />, name: 'Performance' },

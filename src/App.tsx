@@ -36,6 +36,7 @@ function AppContent() {
   );
 }
 
+
 export default function App() {
   console.log('Main JS loaded!');  // TEMP: Test log in bundle
 
